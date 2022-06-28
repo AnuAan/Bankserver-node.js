@@ -3,11 +3,20 @@ const res = require('express/lib/response')
 const jwt = require('jsonwebtoken')
 
 
+//import cors
+const cors = require('cors')
+
+
 //.............import services
 const dataservice = require('./services/data.service')
 
 //server app create using express
 const app = express()
+
+//cors use in server app
+app.use(cors({
+    origin:'http://localhost:4200'
+}))
 
 //parse JSON data
 app.use(express.json())
@@ -53,29 +62,38 @@ res.send("Get request")
 
 //registar API
 app.post('/register',(req,res) =>{
-    const result = dataservice.register(req.body.username,req.body.acno,req.body.password)
+    //solving asynch
+     dataservice.register(req.body.username,req.body.acno,req.body.password)
+    .then(result => {
     res.status(result.StatusCode).json(result)
+    })
 
 })
 
 //login API
 app.post('/login',(req,res) =>{
-    const result = dataservice.login(req.body.acno,req.body.pswd)
+    dataservice.login(req.body.acno,req.body.pswd)
+    .then(result => {
     res.status(result.StatusCode).json(result)
+})
 
 })
 
 //deposit API
 app.post('/deposit',jwtMiddleware,(req,res) =>{
-    const result = dataservice.deposit(req.body.acno,req.body.password,req.body.amt)
+    dataservice.deposit(req.body.acno,req.body.password,req.body.amt)
+    .then(result => {
     res.status(result.StatusCode).json(result)
 
+})
 })
 
 //withdraw
 app.post('/withdraw',jwtMiddleware,(req,res) =>{
-    const result = dataservice.withdraw(req.body.acno,req.body.password,req.body.amt)
+    dataservice.withdraw(req.body.acno,req.body.password,req.body.amt)
+    .then(result => {
     res.status(result.StatusCode).json(result)
+})
 
 })
 
@@ -83,10 +101,11 @@ app.post('/withdraw',jwtMiddleware,(req,res) =>{
 //transactions
 app.post('/transaction',jwtMiddleware,(req,res) =>{
     const result = dataservice.getTransactions(req.body.acno)
+    .then(result => {
     res.status(result.StatusCode).json(result)
 
 })
-
+})
 
 
 
